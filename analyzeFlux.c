@@ -68,19 +68,20 @@ int analyzeFlux(int filenumberstart, int filenumberend, bool bl = false)
 	h4 = new TH1D("hit_ch1","Hit distribution for channel 1 Stilbene",1800, 0,1800);
 	h4->GetXaxis()->SetName("ns");
 	h4->GetXaxis()->SetTitle("ns");
-	h5 = new TH1D("hit_ch2","Hit distrubtion on channel 2 Trigger",1800,0,1800);
+	h5 = new TH1D("hit_ch2","Hit distrubtion on channel 2 Trigger",50,0,1800);
 	h5->GetXaxis()->SetName("ns");
 	h5->GetXaxis()->SetTitle("ns");	
-	h6 = new TH1D("hit_ch3","Hit distribution for channel 3 Fission",1800,0,1800);
+	h6 = new TH1D("hit_ch3","Hit distribution for channel 3 Fission",50,0,1800);
 	h6->GetXaxis()->SetName("ns");
 	h6->GetXaxis()->SetTitle("ns");
-	h7 = new TH1D("tof_fission","TOF Distribution for Stilbene",1800,-800,1000);
-	h8 = new TH1D("tof_stilbene","TOF Time Distribution for Fission Chamber",1800,-800,1000);
+	h7 = new TH1D("tof_stilbene","TOF Distribution for Stilbene",50,-800,1000);
+	h8 = new TH1D("tof_fission","TOF Time Distribution for Fission Chamber",50,-800,1000);
 	h9 = new TH1D("bunch_id", "Distribution of Bunch ID's of Triggers", 1000, 0, 5000);
 	h10 = new TH1D("Ekin","Neutron kinetic energy",400,0.,800);
 	h11 = new TH1D("delta_ch1","Time difference for same event hits Stilbene",100,0,200);
 	h12 = new TH1D("delta_ch3","Time difference for same event hits Fission",100,0,200);
-	h13 = new TH1D("deltaT","Time elapsed",2000,0,2);
+	h13 = new TH1D("deltaT","Number of Triggers over Absolute Time Elapsed", 100,0,2500);
+	h13->GetXaxis()->SetTitle("Ms Elapsed Since File Beginning");
 	
 	TList *l = new TList();
 	l->Add(h1);
@@ -145,6 +146,7 @@ int analyzeFlux(int filenumberstart, int filenumberend, bool bl = false)
 }
 
 void FillHistos(event_t &ev){
+
 	tdc_ev_nb = ev.eventNumberTDC;
 	if(b == 1 || ev.startTimeSec != startCurrentRun){
 		startRun = ev.clockTimeTenthsMs;
@@ -154,7 +156,7 @@ void FillHistos(event_t &ev){
 		printf("start time for this run: %ld \n", startCurrentRun);
 	}
 	else{
-		deltaT = (ev.clockTimeTenthsMs - startRun)/10000.;
+		deltaT = (ev.clockTimeTenthsMs - startRun)/10.;
 	}
 	evCounter++;
 
@@ -172,20 +174,20 @@ void FillHistos(event_t &ev){
 		if((ev.time[j]).channel == 1){
 			times1.push_back((ev.time[j]).value);
 			n_hits_ch1++;
-			h9->Fill(ev.time[j].bunch_id);
 		}
 		else if ((ev.time[j]).channel == 2){
 			times2.push_back((ev.time[j]).value);
 			n_hits_ch2++;
+			h9->Fill(ev.time[j].bunch_id);
 		}
 		else if ((ev.time[j]).channel == 3){
 			times3.push_back((ev.time[j]).value);
 			n_hits_ch3++;
 		}
 	}
-	
-	  if(n_hits_ch1 >0 && n_hits_ch2 >0){
 
+	  if(n_hits_ch1 >0 && n_hits_ch2 >0){
+		  
 		for(int i =0; i < n_hits_ch1; i++){
 			
 			double time_neutron = (times1[i]-times2[0])*lsb;	
@@ -255,6 +257,11 @@ void FillHistos(event_t &ev){
 			h12->Fill(- delta_t2[k+1] + delta_t2[k]);
 		}
 	}
+	else if(n_hits_ch2 > 0){
+	for(int i =0; i < n_hits_ch2; i++){
+          h5->Fill(times2[i]*lsb);
+      }
+	}
 
 	times1.clear();
 	times2.clear();
@@ -284,4 +291,5 @@ double TOF2Energy(double deltaTOF){
 
 	return result;
 }
+
 
