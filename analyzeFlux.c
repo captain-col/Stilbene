@@ -9,6 +9,7 @@
 #include <TList.h>
 #include <TH2D.h>
 #include <math.h>
+#include <TAxis.h>
 #include "/home/csc2168/particle/stilbene/MuonBuffer_test.hh"
 #include <map>
 
@@ -18,6 +19,8 @@ int analyzeFlux(int filenumberstart, int filenumberend, bool bl);
 void FillHistos(event_t& ev);
 int tdc_ev_count = -1;
 int b = 1;
+int nbins = 50;
+int binl = 1800/nbins;
 long startRun;
 long startCurrentRun;
 char path[70] = "/home/csc2168/particle/stilbene/";
@@ -32,7 +35,8 @@ int hitCounter;
 int tdc_ev_nb = 0;
 double time_gamma_bacon = 744.6;
 //double time_gamma = 774.;
-double time_gamma = 780.;
+//double time_gamma = 780.;
+double time_gamma = -500;
 long endRun;
 int above, below;
 double runTime, deltaT;
@@ -50,6 +54,10 @@ TH1D* h10; // Kinetic Energy of Neutrons
 TH1D* h11; // Delta same event hits Ch2
 TH1D* h12; // Delta same event hits Ch3
 TH1D* h13; // Delta_T
+TH1D* h14; // Live Time
+TH1D* h15; // Time difference between stilbene hits
+
+TAxis* live_axis;// live time axis
 
 
 int analyzeFlux(int filenumberstart, int filenumberend, bool bl = false)
@@ -60,7 +68,7 @@ int analyzeFlux(int filenumberstart, int filenumberend, bool bl = false)
 	tdc_ev_nb = 0;
 	above = 0;
 	below = 0;
-	runTime = 0.;
+	runTime = 0.;  
 	deltaT = 0.;
 	h1 = new TH1I("hit_num_ch1","Number of hits on channel 1 Stilbene",10,0,10);
 	h2 = new TH1I("hit_num_ch2","Number of hits on channel 2 Trigger",10,0,10);
@@ -80,8 +88,11 @@ int analyzeFlux(int filenumberstart, int filenumberend, bool bl = false)
 	h10 = new TH1D("Ekin","Neutron kinetic energy",400,0.,800);
 	h11 = new TH1D("delta_ch1","Time difference for same event hits Stilbene",100,0,200);
 	h12 = new TH1D("delta_ch3","Time difference for same event hits Fission",100,0,200);
-	h13 = new TH1D("deltaT","Number of Triggers over Absolute Time Elapsed", 100,0,2500);
+	h13 = new TH1D("deltaT","Number of Triggers over Absolute Time Elapsed", 500,0,2500);
 	h13->GetXaxis()->SetTitle("Ms Elapsed Since File Beginning");
+	h14 = new TH1D("live_time", "Live Time", 50, -800, 1000); // 180 ns dead time
+	live_axis = h14->GetXaxis();
+	h15 = new TH1D("stil_hit_dif", "Time Difference Between Stilbene Hits", 50, 0, 1800);
 	
 	TList *l = new TList();
 	l->Add(h1);
@@ -97,6 +108,8 @@ int analyzeFlux(int filenumberstart, int filenumberend, bool bl = false)
 	l->Add(h11);
 	l->Add(h12);
 	l->Add(h13);
+	l->Add(h14);
+	l->Add(h15);
 
 	char BLFName[100] = "/home/csc2168/particle/stilbene/errorEventFile.txt";
 	FILE* blackListFile = fopen(BLFName,"r");
@@ -146,6 +159,8 @@ int analyzeFlux(int filenumberstart, int filenumberend, bool bl = false)
 }
 
 void FillHistos(event_t &ev){
+	int bin_num = 0;
+	int hit_num = 0;
 
 	tdc_ev_nb = ev.eventNumberTDC;
 	if(b == 1 || ev.startTimeSec != startCurrentRun){
@@ -262,11 +277,43 @@ void FillHistos(event_t &ev){
           h5->Fill(times2[i]*lsb);
       }
 	}
+	
+	//dead time correction
+	if(n_hits_ch1 > 0){
+		hit_num = 0;
+		bin_num = live_axis->FindBin((times1[hit_num] - times2[0])*lsb);
+		for(int i = 0; i < nbins; i++){
+			if(i == bin_num){
+				h14->Fill(i*binl - 800);
+				i = i + 5; //5 * 36ns bins = 180ns
+				hit_num++;
+				if(hit_num < n_hits_ch1){
+					bin_num = live_axis->FindBin((times1[hit_num] - times2[0])*lsb);
+					if(bin_num < i){
+						printf("Error! Second hit within dead time!\n");
+					}
+				}
+			}
+			else{
+				h14->Fill(i*binl - 800);
+			}
+		}
+	}
+	else{
+		for(int i = 0; i < nbins; i++){
+			h14->Fill(i*binl - 800);
+		}
+	}
+	
+	if(n_hits_ch1 > 1){
+		for(int i = 0; i < n_hits_ch1 -1; i++){
+			h15->Fill((times1[i+1] - times1[i])*lsb);
+		}
+	}
 
 	times1.clear();
 	times2.clear();
 	times3.clear();
-
 
 	h1->Fill(n_hits_ch1);
 	h2->Fill(n_hits_ch2);
@@ -278,7 +325,7 @@ void FillHistos(event_t &ev){
 double TOF2Energy(double deltaTOF){
 	deltaTOF=deltaTOF/1.E9;  //in s
 	double c = 299792458; //in m/s
-	double l = 25; //target to detector distance in m
+	double l = 15; //target to detector distance in m
 	double m = 939.5/(c*c);  //neutron mass in MeV
 	double TOFgamma = l/c;
 	double result = 900;
