@@ -201,39 +201,7 @@ void FillHistos(event_t &ev){
 		}
 	}
 
-	  if(n_hits_ch1 >0 && n_hits_ch2 >0){
-		  
-		for(int i =0; i < n_hits_ch1; i++){
-			
-			double time_neutron = (times1[i]-times2[0])*lsb;	
-			double deltaTOF = time_gamma - time_neutron;
-			double Ekin = TOF2Energy(deltaTOF);	
-			if(Ekin <=800. && Ekin >=scintThresh){
-				h10->Fill(Ekin);
-			}
-			else if (Ekin > 800.){
-				above++;
-			}
-			else if(Ekin < scintThresh){
-				below++;
-			}
-		}
-		std::vector<double> delta_t;
-		for(int i =0; i < n_hits_ch2; i++){
-            h5->Fill(times2[i]*lsb);
-        }
-		for(int i =0; i < n_hits_ch1; i++){
-			delta_t.push_back((times1[i]-times2[0])*lsb);
-			h7->Fill((times1[i]-times2[0])*lsb);
-			h4->Fill(times1[i]*lsb);
-		}
-		for(int k = 0; k < delta_t.size() - 1; k++){
-			h11->Fill(- delta_t[k+1] + delta_t[k]);
-		}
-	
-	}
-	
-	else if(n_hits_ch1 >0 && n_hits_ch2 >0 && n_hits_ch3 > 0){
+	if(n_hits_ch1 >0 && n_hits_ch2 >0 && n_hits_ch3 > 0){
 
 		for(int i =0; i < n_hits_ch1; i++){
 			
@@ -272,6 +240,39 @@ void FillHistos(event_t &ev){
 			h12->Fill(- delta_t2[k+1] + delta_t2[k]);
 		}
 	}
+	
+	else if(n_hits_ch1 >0 && n_hits_ch2 >0){
+		  
+		for(int i =0; i < n_hits_ch1; i++){
+			
+			double time_neutron = (times1[i]-times2[0])*lsb;	
+			double deltaTOF = time_gamma - time_neutron;
+			double Ekin = TOF2Energy(deltaTOF);	
+			if(Ekin <=800. && Ekin >=scintThresh){
+				h10->Fill(Ekin);
+			}
+			else if (Ekin > 800.){
+				above++;
+			}
+			else if(Ekin < scintThresh){
+				below++;
+			}
+		}
+		std::vector<double> delta_t;
+		for(int i =0; i < n_hits_ch2; i++){
+            h5->Fill(times2[i]*lsb);
+        }
+		for(int i =0; i < n_hits_ch1; i++){
+			delta_t.push_back((times1[i]-times2[0])*lsb);
+			h7->Fill((times1[i]-times2[0])*lsb);
+			h4->Fill(times1[i]*lsb);
+		}
+		for(int k = 0; k < delta_t.size() - 1; k++){
+			h11->Fill(- delta_t[k+1] + delta_t[k]);
+		}
+	
+	}
+	
 	else if(n_hits_ch2 > 0){
 	for(int i =0; i < n_hits_ch2; i++){
           h5->Fill(times2[i]*lsb);
