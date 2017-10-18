@@ -218,8 +218,10 @@ void FillHistos(event_t &ev){
 				below++;
 			}
 		}
+		
 		std::vector<double> delta_t;
 		std::vector<double> delta_t2;
+		
 		for(int i =0; i < n_hits_ch2; i++){
             h5->Fill(times2[i]*lsb);
         }
@@ -271,6 +273,22 @@ void FillHistos(event_t &ev){
 			h11->Fill(- delta_t[k+1] + delta_t[k]);
 		}
 	
+	}
+	
+	else if(n_hits_ch3 >0 && n_hits_ch2 >0){
+		  
+		std::vector<double> delta_t2;
+		for(int i =0; i < n_hits_ch2; i++){
+            h5->Fill(times2[i]*lsb);
+        }
+		for(int i =0; i < n_hits_ch3; i++){
+			delta_t2.push_back((times3[i]-times2[0])*lsb);
+			h6->Fill(times3[i]*lsb);
+			h8->Fill((times3[i]-times2[0])*lsb);
+		}
+		for(int k = 0; k < delta_t2.size() - 1; k++){
+			h12->Fill(- delta_t2[k+1] + delta_t2[k]);
+		}
 	}
 	
 	else if(n_hits_ch2 > 0){
