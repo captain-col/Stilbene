@@ -76,23 +76,23 @@ int analyzeFlux(int filenumberstart, int filenumberend, bool bl = false)
 	h4 = new TH1D("hit_ch1","Hit distribution for channel 1 Stilbene",1800, 0,1800);
 	h4->GetXaxis()->SetName("ns");
 	h4->GetXaxis()->SetTitle("ns");
-	h5 = new TH1D("hit_ch2","Hit distrubtion on channel 2 Trigger",150,0,1800);
+	h5 = new TH1D("hit_ch2","Hit distrubtion on channel 2 Trigger",1800,0,1800);
 	h5->GetXaxis()->SetName("ns");
 	h5->GetXaxis()->SetTitle("ns");	
-	h6 = new TH1D("hit_ch3","Hit distribution for channel 3 Fission",150,0,1800);
+	h6 = new TH1D("hit_ch3","Hit distribution for channel 3 Fission",1800,0,1800);
 	h6->GetXaxis()->SetName("ns");
 	h6->GetXaxis()->SetTitle("ns");
-	h7 = new TH1D("tof_stilbene","TOF Distribution for Stilbene",150,-800,1000);
-	h8 = new TH1D("tof_fission","TOF Time Distribution for Fission Chamber",150,-800,1000);
+	h7 = new TH1D("tof_stilbene","TOF Distribution for Stilbene",1800,-800,1000);
+	h8 = new TH1D("tof_fission","TOF Time Distribution for Fission Chamber",1800,-800,1000);
 	h9 = new TH1D("bunch_id", "Distribution of Bunch ID's of Triggers", 1000, 0, 5000);
 	h10 = new TH1D("Ekin","Neutron kinetic energy",400,0.,800);
 	h11 = new TH1D("delta_ch1","Time difference for same event hits Stilbene",100,0,200);
 	h12 = new TH1D("delta_ch3","Time difference for same event hits Fission",100,0,200);
 	h13 = new TH1D("deltaT","Number of Triggers over Absolute Time Elapsed", 500,0,2500);
 	h13->GetXaxis()->SetTitle("Ms Elapsed Since File Beginning");
-	h14 = new TH1D("live_time", "Live Time", 150, -800, 1000); // 180 ns dead time
+	h14 = new TH1D("live_time", "Live Time", 1800, -800, 1000); // 180 ns dead time
 	live_axis = h14->GetXaxis();
-	h15 = new TH1D("stil_hit_dif", "Time Difference Between Stilbene Hits", 50, 0, 1800);
+	h15 = new TH1D("stil_hit_dif", "Time Difference Between Stilbene Hits", 1800, 0, 1800);
 	
 	TList *l = new TList();
 	l->Add(h1);
