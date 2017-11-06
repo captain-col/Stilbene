@@ -19,7 +19,7 @@ int analyzeFlux(int filenumberstart, int filenumberend, bool bl);
 void FillHistos(event_t& ev);
 int tdc_ev_count = -1;
 int b = 1;
-int nbins = 50;
+int nbins = 1800;
 int binl = 1800/nbins;
 long startRun;
 long startCurrentRun;
