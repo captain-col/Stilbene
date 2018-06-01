@@ -24,15 +24,19 @@ void hadd() {
    // root > .L hadd.C
    // root > hadd()
 
-   Target = TFile::Open( "result.root", "RECREATE" );
+   Target = TFile::Open( "full_result2.root", "RECREATE" );
 
    FileList = new TList();
    FileList->Add( TFile::Open("histos_17903_18826.root") );
+  // FileList->Add( TFile::Open("histos_18827_19803.root") ); //fission only
    FileList->Add( TFile::Open("histos_19804_21670.root") );
+  //FileList->Add( TFile::Open("histos_21671_22430.root") ); //fission only
    FileList->Add( TFile::Open("histos_22431_26854.root") );
+  // FileList->Add( TFile::Open("histos_26855_27822.root") ); //fission only
    FileList->Add( TFile::Open("histos_27823_38350.root") );
    FileList->Add( TFile::Open("histos_38352_49763.root") );
    FileList->Add( TFile::Open("histos_49773_51749.root") );
+ // FileList->Add( TFile::Open("histos_51750_54730.root") ); //fission only
    FileList->Add( TFile::Open("histos_54731_73543.root") );  
    FileList->Add( TFile::Open("histos_73544_73678.root") );
    FileList->Add( TFile::Open("histos_73679_73857.root") );
@@ -42,10 +46,18 @@ void hadd() {
    FileList->Add( TFile::Open("histos_95329_99518.root") );
    FileList->Add( TFile::Open("histos_99519_99999.root") );
    FileList->Add( TFile::Open("histos_100000_100273.root") );
-   FileList->Add( TFile::Open("histos_101026_102141.root") );
-   FileList->Add( TFile::Open("histos_102508_103391.root") );
+//   FileList->Add( TFile::Open("histos_100274_101025.root") ); //fission only 
+   FileList->Add( TFile::Open("histos_101026_102141.root") ); //needs shift for stilbene
+  // FileList->Add( TFile::Open("histos_102142_102295.root") ); //fission only
+//  FileList->Add( TFile::Open("histos_102296_102507.root") ); //fission only
+   FileList->Add( TFile::Open("histos_102508_103391.root") ); //needs shift for stilbene
+ //  FileList->Add( TFile::Open("histos_103392_103601.root") ); //fission only
   // FileList->Add( TFile::Open("histos_104794_104869.root") );
- //  FileList->Add( TFile::Open("histos_105729_106535.root") );
+//  FileList->Add( TFile::Open("histos_104870_105155.root") ); //fission only
+ //FileList->Add( TFile::Open("histos_105156_105635.root") ); //fission only
+ //FileList->Add( TFile::Open("histos_105636_105728.root") ); //fission only
+  //  FileList->Add( TFile::Open("histos_105729_106535.root") );
+// FileList->Add( TFile::Open("histos_106536_107307.root") ); //fission only
 
    MergeRootfile( Target, FileList );
 
