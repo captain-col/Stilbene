@@ -10,7 +10,7 @@
 #include <TH2D.h>
 #include <math.h>
 #include <TAxis.h>
-#include "/home/cocal/analysis/stilbene/Stilbene/MuonBuffer_test.hh"
+#include "MuonBuffer_test.hh"
 #include <map>
 
 event_t event_buffer;
@@ -18,15 +18,15 @@ int analyzeFlux(int filenumberstart, int filenumberend, bool bl);
 void FillHistos(event_t& ev);
 int tdc_ev_count = -1;
 int b = 1;
-int nbins = 1800;
+int nbins = 600;
 int binl = 1800/nbins;
 long startRun;
 long startCurrentRun;
-char path[70] = "/nfs/disk0/minicaptain/data/2017/stilbene/stilbene2017_3";
+char path[70] = "./";
 double lsb = 0.025;
 double TOF2Energy(double TOF);
 double scintThresh = 50.;
-int ebins = 500;
+int ebins = 400;
 
 long timeBin = 10000; //1 s in tenths of ms
 int evCounter;
@@ -39,7 +39,7 @@ double runTime, deltaT;
 
 int stil_shift = 518;
 int fiss_shift = 421;
-
+int enbins = 200;
 
 TH1I* h1; // hits on channel 1 stilbene
 TH1I* h2; // hits on channel 2 trigger
@@ -127,14 +127,10 @@ int analyzeFlux(int filenumberstart, int filenumberend, bool bl = false)
 	h18->GetXaxis()->SetTitle("MeV");
 	live_axis2 = h18->GetXaxis();
 	h19 = new TH1D("e_bin_num", "Value of Bin Numbers", nbins, 0, nbins);
-//	h20 = new TH1D("hit_val", "Value used in Live Time", nbins, -200, 1600);
-	h21 = new TH1D("es_tof_stilbene", "KE Distribution for Stilbene", nbins, 0, 1800);
-	h22 = new TH1D("es_tof_fission", "KE Distribution for Fission Chamber", nbins, 0 , 1800);
-	h23 = new TH1D("es_live_time", "KE Distributin for Live Time", nbins, 0, 1800);
-	
-	for(int i = 1; i < nbins; i++){
-	  printf("Bin %d, Center %f\n", i, h18->GetBinCenter(i));
-	}
+	h20 = new TH1D("hit_val", "Value used in Live Time", nbins, -200, 1600);
+	h21 = new TH1D("es_tof_stilbene", "KE Distribution for Stilbene", enbins, 0., 1200);
+	h22 = new TH1D("es_tof_fission", "KE Distribution for Fission Chamber", enbins, 0. , 1200);
+	h23 = new TH1D("es_live_time", "KE Distributin for Live Time", enbins, 0., 1200);
 
 	
 	TList *l = new TList();
@@ -157,12 +153,12 @@ int analyzeFlux(int filenumberstart, int filenumberend, bool bl = false)
 	l->Add(h17);
 	l->Add(h18);
 	l->Add(h19);
-//	l->Add(h20);
+	l->Add(h20);
 	l->Add(h21);
 	l->Add(h22);
 	l->Add(h23);
 
-	char BLFName[100] = "/home/cocal/analysis/stilbene/Stilbene/errorEventFile.txt";
+	char BLFName[100] = "errorEventFile.txt";
 	FILE* blackListFile = fopen(BLFName,"r");
 	std::map<int,int> BLmap;
 	std::map<int,int>::iterator blit;
@@ -185,7 +181,7 @@ int analyzeFlux(int filenumberstart, int filenumberend, bool bl = false)
 		printf("Opening file %s\n",filename);
 		int evCt = 0;
 		while(fread(&event_buffer,sizeof(event_buffer),1,outFile) == 1){
-			if(evCt < maxEvent){	
+			if(evCt < maxEvent){ 
 			FillHistos(event_buffer);
 			}
 			if(evCt%1000 == 0){ 
@@ -203,6 +199,7 @@ int analyzeFlux(int filenumberstart, int filenumberend, bool bl = false)
 	}
 	h18->Scale(1/(h2->Integral()));
 	h14->Scale(1/(h2->Integral()));
+	h23->Scale(1/(h2->Integral()));
 
 	runTime += deltaT;
 	printf("events processed: %d, duration %f s \n",evCounter, runTime);
